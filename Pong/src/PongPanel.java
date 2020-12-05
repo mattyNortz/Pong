@@ -15,6 +15,12 @@ public class PongPanel extends JPanel implements ActionListener, KeyListener{
 	
 	private final static Color BACKGROUND_COLOR = Color.BLACK;
 	private final static int TIMER_DELAY = 5;
+	GameState gameState = GameState.Initialising;
+	Ball ball;
+	Paddle paddle1;
+	Paddle paddle2;
+	Player One;
+	Player Two;
 	
 	PongPanel(){
 		setBackground(BACKGROUND_COLOR);
@@ -50,6 +56,11 @@ public class PongPanel extends JPanel implements ActionListener, KeyListener{
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
 		paintDottedLine(g);
+		if(gameState != GameState.Initialising) {
+			paintSprite(g, ball);
+			paintSprite(g, paddle1);
+			paintSprite(g, paddle2);
+		}
 		
 	}
 	private void paintDottedLine(Graphics g) {
@@ -62,7 +73,32 @@ public class PongPanel extends JPanel implements ActionListener, KeyListener{
 	}
 	
 	private void update() {
+		switch (gameState) {
+		case Initialising: {
+			createObjects();
+			gameState = GameState.Playing;
+			break;
+		}
+		case Playing:{
+			break;
+		}
+		case GameOver:{
+			break;
+		}
+		}
 		
+	}
+	
+	public void createObjects() {
+		
+		ball = new Ball(getWidth(), getHeight());
+		paddle1 = new Paddle(Player.One, getWidth(), getHeight());
+		paddle2 = new Paddle(Player.Two, getWidth(), getHeight());
+		
+	}
+	private void paintSprite(Graphics g, Sprite sprite) {
+		g.setColor(sprite.getColour());
+		g.fillRect(sprite.getxPosition(), sprite.getyPosition(), sprite.getWidth(), sprite.getHeight());
 	}
 	
 
