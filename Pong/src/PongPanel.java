@@ -2,6 +2,7 @@ import javax.swing.JPanel;
 import javax.swing.Timer;
 import java.awt.event.KeyListener;
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -16,6 +17,17 @@ public class PongPanel extends JPanel implements ActionListener, KeyListener{
 	private final static Color BACKGROUND_COLOR = Color.BLACK;
 	private final static int TIMER_DELAY = 5;
 	private final static int BALL_MOVEMENT_SPEED = 1;
+	private final static int POINTS_TO_WIN = 3;
+	private final static String SCORE_FONT_FAMILY = "Serif";
+	private final static int SCORE_FONT_SIZE = 50;
+	private final static int SCORE_TEXT_Y = 100;
+	private final static int SCORE_TEXT_X = 100;
+	private final static int WINNER_TEXT_X = 200;
+	private final static int WINNER_TEXT_Y = 200;
+	private final static String PLAYER_WINNER_TEXT = "WIN";
+	int player1Score = 0;
+	int player2Score = 0;
+	Player gameWinner;
 	GameState gameState = GameState.Initialising;
 	Ball ball;
 	Paddle paddle1;
@@ -54,10 +66,12 @@ public class PongPanel extends JPanel implements ActionListener, KeyListener{
 	@Override
 	public void keyReleased(KeyEvent event) {
 		// TODO Auto-generated method stub
-		if(event.getKeyCode() == KeyEvent.VK_UP || event.getKeyCode() == KeyEvent.VK_DOWN 
-				|| event.getKeyCode() == KeyEvent.VK_W || event.getKeyCode() == KeyEvent.VK_S) {
+		if(event.getKeyCode() == KeyEvent.VK_UP || event.getKeyCode() == KeyEvent.VK_DOWN) 
+			{
             paddle2.setyVelocity(0);
-            paddle1.setyVelocity(0);
+            
+		}else if (event.getKeyCode() == KeyEvent.VK_W || event.getKeyCode() == KeyEvent.VK_S) {
+			paddle1.setyVelocity(0);
 		}
 	}
 
@@ -75,6 +89,8 @@ public class PongPanel extends JPanel implements ActionListener, KeyListener{
 			paintSprite(g, ball);
 			paintSprite(g, paddle1);
 			paintSprite(g, paddle2);
+			paintScores(g);
+			paintWinner(g);
 		}
 		
 	}
@@ -102,6 +118,7 @@ public class PongPanel extends JPanel implements ActionListener, KeyListener{
 			moveObject(ball);
 			checkWallBounce();
 			checkPaddleBounce();
+			checkWin();
 			break;
 		}
 		case GameOver:{
@@ -128,12 +145,18 @@ public class PongPanel extends JPanel implements ActionListener, KeyListener{
 		
 	}
 	private void checkWallBounce() {
-	if (ball.getxPosition() <= 0) {
+	if (ball.getxPosition() <= 0) //Ball hits left had side wall 
+		{
 		ball.setxVelocity(-ball.getxVelocity());
+		addScore(Player.Two);
 		resetBall();
-		}else if (ball.getxPosition() >= getWidth() - ball.getWidth()) {
+		
+		}else if (ball.getxPosition() >= getWidth() - ball.getWidth()) //Ball hit right had side wall
+			{
 			ball.setxVelocity(-ball.getxVelocity());
+			addScore(Player.One);
 			resetBall();
+			
 		}
 	if (ball.getyPosition() <= 0 || ball.getyPosition() >= getHeight() - ball.getHeight()) {
 		ball.setyVelocity(-ball.getyVelocity());
@@ -148,10 +171,48 @@ public class PongPanel extends JPanel implements ActionListener, KeyListener{
 		}
 		if (ball.getxVelocity() > 0 && ball.getRectangle().intersects(paddle2.getRectangle())) {
 			ball.setxVelocity(-BALL_MOVEMENT_SPEED);
-		}
-		
+		}		
 		
 	}
+	private void addScore(Player player) {
+		if (player == Player.One) {
+			player1Score ++;			
+		}else {
+			player2Score ++;
+		}
+	}
+	private void checkWin() {
+		if (player1Score >= POINTS_TO_WIN) {
+			gameWinner = Player.One;
+			gameState = GameState.GameOver; 
+		}else if (player2Score >= POINTS_TO_WIN) {
+			gameWinner = Player.Two;
+			gameState = GameState.GameOver; 
+		}
+	}
+	private void paintScores(Graphics g) {
+		Font scoreFont = new Font(SCORE_FONT_FAMILY, Font.BOLD, SCORE_FONT_SIZE);
+		String leftScore = Integer.toString(player1Score);
+		String rightScore = Integer.toString(player2Score);
+		g.setFont(scoreFont);
+		g.drawString(leftScore, SCORE_TEXT_X, SCORE_TEXT_Y);
+		g.drawString(rightScore, getWidth() - SCORE_TEXT_X, SCORE_TEXT_Y);
+	}
+	private void paintWinner(Graphics g) {
+		if(gameWinner != null) {
+		Font winnerFont = new Font(SCORE_FONT_FAMILY, Font.BOLD, SCORE_FONT_SIZE);
+		g.setFont(winnerFont);
+		int xPosition = getWidth() /2;
+		
+		if (gameWinner == Player.One) {
+			xPosition -= WINNER_TEXT_X;
+		}else if (gameWinner == Player.Two) {
+			xPosition += WINNER_TEXT_X;
+		}
+		g.drawString(PLAYER_WINNER_TEXT, xPosition, WINNER_TEXT_Y );
+		}
+	}
+	
 	
 	
 	

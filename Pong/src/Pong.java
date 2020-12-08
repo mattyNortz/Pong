@@ -2,8 +2,8 @@ import javax.swing.JFrame;
 
 public class Pong extends JFrame{
 	private static final String WINDOW_TITLE = "Pong";
-	private static final int WINDOW_WIDTH = 800;
-	private final int WINDOW_HEIGHT = 800;
+	private static final int WINDOW_WIDTH = 900;
+	private final int WINDOW_HEIGHT = 900;
 	
 	public Pong() {
 		setTitle(WINDOW_TITLE);
