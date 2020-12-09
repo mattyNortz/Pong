@@ -22,13 +22,16 @@ public class PongPanel extends JPanel implements ActionListener, KeyListener{
 	private final static int SCORE_FONT_SIZE = 50;
 	private final static int SCORE_TEXT_Y = 100;
 	private final static int SCORE_TEXT_X = 100;
-	private final static int WINNER_TEXT_X = 200;
+	private final static int WINNER_TEXT_X = 300;
+	private final static int WINNER_TEXT_X_1 = 400;
 	private final static int WINNER_TEXT_Y = 200;
+	private final static String PAUSE_GAME_TEXT = "PAUSED";
+	private final static String START_GAME_TEXT = "Press ENTER to start";
 	private final static String PLAYER_WINNER_TEXT = "WIN";
 	int player1Score = 0;
 	int player2Score = 0;
 	Player gameWinner;
-	GameState gameState = GameState.Initialising;
+	GameState gameState = GameState.ApplicationStarted;
 	Ball ball;
 	Paddle paddle1;
 	Paddle paddle2;
@@ -53,13 +56,23 @@ public class PongPanel extends JPanel implements ActionListener, KeyListener{
 	public void keyPressed(KeyEvent event) {
 		// TODO Auto-generated method stub
 		if (event.getKeyCode() == KeyEvent.VK_UP) {
-			paddle2.setyVelocity(-1);
+			paddle2.setyVelocity(-2);
 		}else if (event.getKeyCode() == KeyEvent.VK_DOWN) {
-			paddle2.setyVelocity(1);
+			paddle2.setyVelocity(2);
 		}else if (event.getKeyCode() == KeyEvent.VK_W) {
-			paddle1.setyVelocity(-1);
+			paddle1.setyVelocity(-2);
 		}else if (event.getKeyCode() == KeyEvent.VK_S) {
-			paddle1.setyVelocity(1);
+			paddle1.setyVelocity(2);
+		}else if(event.getKeyCode() == KeyEvent.VK_ENTER) {
+			resetScores();
+			gameState = GameState.Initialising;
+		}else if(event.getKeyCode() == KeyEvent.VK_P) {
+			if (gameState != GameState.Pause) {
+				gameState = GameState.Pause;
+			}else {
+				gameState = GameState.Playing;
+			}
+			
 		}
 	}
 
@@ -84,16 +97,33 @@ public class PongPanel extends JPanel implements ActionListener, KeyListener{
 	@Override
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
-		paintDottedLine(g);
-		if(gameState != GameState.Initialising) {
+		
+		if(gameState == GameState.Playing) {
+			paintScores(g);
+			paintDottedLine(g);
 			paintSprite(g, ball);
 			paintSprite(g, paddle1);
 			paintSprite(g, paddle2);
+			
+		}else if(gameState == GameState.ApplicationStarted) {
+			paintStartGame(g);
+		}else if (gameState == GameState.GameOver) {
 			paintScores(g);
 			paintWinner(g);
+			paintStartGame(g);
+		}else if (gameState == GameState.Pause) {
+			paintPaused(g);
 		}
 		
 	}
+	private void paintPaused(Graphics g) {
+		Font pauseGame = new Font(SCORE_FONT_FAMILY, Font.BOLD, SCORE_FONT_SIZE);
+		String pauseGameText = PAUSE_GAME_TEXT;
+		g.setFont(pauseGame);
+		g.drawString(pauseGameText, getWidth() / 2 - 100, getHeight() / 2);
+		
+	}
+
 	private void paintDottedLine(Graphics g) {
 		Graphics2D g2d = (Graphics2D) g.create();
 		Stroke dashed = new BasicStroke(3, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL, 0, new float[] {9}, 0);
@@ -110,6 +140,7 @@ public class PongPanel extends JPanel implements ActionListener, KeyListener{
 			gameState = GameState.Playing;
 			ball.setxVelocity(BALL_MOVEMENT_SPEED);
 			ball.setyVelocity(BALL_MOVEMENT_SPEED);
+			
 			break;
 		}
 		case Playing:{
@@ -122,8 +153,10 @@ public class PongPanel extends JPanel implements ActionListener, KeyListener{
 			break;
 		}
 		case GameOver:{
+			
 			break;
 		}
+		
 		}
 		
 	}
@@ -177,9 +210,10 @@ public class PongPanel extends JPanel implements ActionListener, KeyListener{
 	private void addScore(Player player) {
 		if (player == Player.One) {
 			player1Score ++;			
-		}else {
+		}else if (player == Player.Two) {
 			player2Score ++;
-		}
+		} 
+		
 	}
 	private void checkWin() {
 		if (player1Score >= POINTS_TO_WIN) {
@@ -205,12 +239,22 @@ public class PongPanel extends JPanel implements ActionListener, KeyListener{
 		int xPosition = getWidth() /2;
 		
 		if (gameWinner == Player.One) {
-			xPosition -= WINNER_TEXT_X;
+			xPosition -= WINNER_TEXT_X_1;
 		}else if (gameWinner == Player.Two) {
 			xPosition += WINNER_TEXT_X;
 		}
 		g.drawString(PLAYER_WINNER_TEXT, xPosition, WINNER_TEXT_Y );
 		}
+	}
+	private void paintStartGame(Graphics g) {
+		Font startGame = new Font(SCORE_FONT_FAMILY, Font.BOLD, SCORE_FONT_SIZE);
+		String startGameText = START_GAME_TEXT;
+		g.setFont(startGame);
+		g.drawString(startGameText, getWidth() / 4, getHeight() / 2);
+	}
+	private void resetScores() {
+		player1Score = 0;
+		player2Score = 0;
 	}
 	
 	

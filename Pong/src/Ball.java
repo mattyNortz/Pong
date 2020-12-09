@@ -5,6 +5,7 @@ static final Color BALL_COLOUR = Color.white;
 static final int BALL_WIDTH = 25;
 static final int BALL_HEIGHT = 25;
 
+
 public Ball(int panelWidth, int panelHeight) {
 	setWidth(BALL_WIDTH);
 	setHeight(BALL_HEIGHT);
